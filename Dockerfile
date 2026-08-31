@@ -11,9 +11,11 @@ COPY . .
 
 RUN composer install --no-dev --optimize-autoloader --no-scripts
 
-# Create SQLite database file if it doesn't exist
-RUN touch database/database.sqlite
+# Create SQLite database & grant full write permissions to storage, cache, and database
+RUN touch database/database.sqlite \
+    && chmod -R 777 database storage bootstrap/cache
 
-# Render assigns a dynamic $PORT environment variable
 EXPOSE 8080
-CMD ["sh", "-c", "php artisan migrate --force && php artisan db:seed --force && php artisan serve --host 0.0.0.0 --port ${PORT:-8080}"]
+
+# Generate key if missing, run migrations + seeders, and start the server
+CMD ["sh", "-c", "php artisan key:generate --force && php artisan config:clear && php artisan migrate --force && php artisan db:seed --force && php artisan serve --host 0.0.0.0 --port ${PORT:-8080}"]
