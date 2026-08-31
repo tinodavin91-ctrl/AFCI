@@ -42,8 +42,20 @@ class CommentController extends Controller
             'body' => $data['body'],
         ]);
 
+        // Send notification to content creator if someone else commented
+        if ($model->user_id && (int) $model->user_id !== (int) $request->user()->id) {
+            \App\Models\AppNotification::create([
+                'user_id' => $model->user_id,
+                'type' => 'comment',
+                'title' => 'New Comment',
+                'message' => $request->user()->name . ' commented on your ' . $type . ': "' . ($model->title ?? 'item') . '".',
+                'data' => ['type' => $type, 'id' => $id, 'comment_id' => $comment->id],
+            ]);
+        }
+
         return new CommentResource($comment->load('user'));
     }
+
 
     public function destroy(Request $request, Comment $comment)
     {

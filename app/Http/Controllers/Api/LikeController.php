@@ -37,6 +37,19 @@ class LikeController extends Controller
         }
 
         $model->likes()->create(['user_id' => $userId]);
+
+        // Send notification to content creator if someone else liked their content
+        if ($model->user_id && (int) $model->user_id !== (int) $userId) {
+            \App\Models\AppNotification::create([
+                'user_id' => $model->user_id,
+                'type' => 'like',
+                'title' => 'New Like',
+                'message' => $request->user()->name . ' liked your ' . $type . ': "' . ($model->title ?? 'item') . '".',
+                'data' => ['type' => $type, 'id' => $id, 'liker_id' => $userId],
+            ]);
+        }
+
         return response()->json(['liked' => true, 'likes_count' => $model->likes()->count()]);
     }
 }
+
