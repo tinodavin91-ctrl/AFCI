@@ -81,7 +81,7 @@ class ArticleSeeder extends Seeder
             foreach ($fallbackArticles as $articleData) {
                 Article::create(array_merge($articleData, [
                     'user_id' => $user->id,
-                    'slug' => Str::slug($articleData['title']),
+                    'slug' => Str::slug($articleData['title']) . '-' . Str::random(6),
                 ]));
             }
         }
