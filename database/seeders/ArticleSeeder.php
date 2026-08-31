@@ -10,9 +10,11 @@ class ArticleSeeder extends Seeder
 {
     public function run(): void
     {
-        $user = User::first() ?? User::factory()->create([
+        $user = User::first() ?? User::create([
             'name' => 'Media Creator',
             'email' => 'creator@afce.com',
+            'password' => bcrypt('password123'),
+            'role' => 'admin',
         ]);
 
         $articles = [
