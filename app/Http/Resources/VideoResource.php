@@ -12,19 +12,22 @@ class VideoResource extends JsonResource
      *
      * @return array<string, mixed>
      */
- public function toArray($request): array
-{
-    return [
-        'id' => $this->id,
-        'title' => $this->title,
-        'description' => $this->description,
-        'video_url' => $this->video_url,
-        'thumbnail_url' => $this->thumbnail_url,
-        'duration' => $this->duration,
-        'category' => $this->category,
-        'views' => $this->views,
-        'published_at' => $this->published_at,
-        'likes_count' => $this->likes()->count(),
-    ];
+    public function toArray($request): array
+    {
+        return [
+            'id' => $this->id,
+            'title' => $this->title,
+            'description' => $this->description,
+            'video_url' => $this->video_url,
+            'thumbnail_url' => $this->thumbnail_url,
+            'duration' => $this->duration,
+            'category' => $this->category,
+            'views' => $this->views,
+            'published_at' => $this->published_at,
+            'likes_count' => $this->likes()->count(),
+            'comments_count' => $this->comments()->count(),
+            'author_name' => $this->user?->name ?? 'AFCE Media',
+        ];
+    }
 }
-}
+

@@ -5,7 +5,8 @@ use App\Http\Controllers\Api\VideoController;
 use App\Http\Controllers\Api\TrackController;
 use App\Http\Controllers\Api\ArticleController;
 use App\Http\Controllers\Api\LikeController;
-use App\Http\Controllers\Api\CommentController;
+use App\Http\Controllers\Api\TrendingController;
+use App\Http\Controllers\Api\CategoryController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -14,7 +15,11 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
 Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
-// Public content browsing
+// Public content & trends browsing
+Route::get('/trending', [TrendingController::class, 'index']);
+Route::get('/categories', [CategoryController::class, 'categories']);
+Route::get('/genres', [CategoryController::class, 'genres']);
+
 Route::get('/videos', [VideoController::class, 'index']);
 Route::get('/videos/{video}', [VideoController::class, 'show']);
 Route::get('/tracks', [TrackController::class, 'index']);
