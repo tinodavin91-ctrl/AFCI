@@ -9,6 +9,7 @@ use App\Models\Track;
 use App\Models\Video;
 use Illuminate\Http\Request;
 
+
 class LikeController extends Controller
 {
     protected function resolveModel(string $type, int $id)
