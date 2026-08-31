@@ -36,4 +36,10 @@ public function comments(): MorphMany
 {
     return $this->morphMany(Comment::class, 'commentable');
 }
+
+public function bookmarks(): MorphMany
+{
+    return $this->morphMany(Bookmark::class, 'bookmarkable');
 }
+}
+
