@@ -9,8 +9,11 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 WORKDIR /app
 COPY . .
 
-# Ensure .env exists by copying .env.example, create SQLite DB, and set write permissions
+# Create production .env from .env.example with pre-generated APP_KEY
 RUN cp .env.example .env \
+    && sed -i 's/APP_KEY=/APP_KEY=base64:NfZ\/ahEryTyd8BSRJy3cRfGUnubersxtpk2yqV\/c+H0=/g' .env \
+    && sed -i 's/APP_ENV=local/APP_ENV=production/g' .env \
+    && sed -i 's/APP_DEBUG=true/APP_DEBUG=false/g' .env \
     && touch database/database.sqlite \
     && chmod -R 777 .env database storage bootstrap/cache
 
@@ -18,5 +21,4 @@ RUN composer install --no-dev --optimize-autoloader --no-scripts
 
 EXPOSE 8080
 
-# Auto-generate key into .env, clear config, migrate, seed, and start server
-CMD ["sh", "-c", "php artisan key:generate --force && php artisan config:clear && php artisan migrate --force && php artisan db:seed --force && php artisan serve --host 0.0.0.0 --port ${PORT:-8080}"]
+CMD ["sh", "-c", "php artisan config:clear && php artisan migrate --force && php artisan db:seed --force && php artisan serve --host 0.0.0.0 --port ${PORT:-8080}"]
