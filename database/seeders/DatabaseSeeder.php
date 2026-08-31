@@ -12,14 +12,24 @@ class DatabaseSeeder extends Seeder
 
     /**
      * Seed the application's database.
+     *
+     * Order: Users first (so content seeders have users to assign to),
+     * then content (tracks, videos, articles).
+     *
+     * Each seeder fetches live data from third-party APIs when available
+     * and falls back to hardcoded seed data if the APIs are unreachable.
      */
     public function run(): void
     {
+        $this->command->info('🌐 Starting live-data seeding...');
+
         $this->call([
-            VideoSeeder::class,
+            UserSeeder::class,
             TrackSeeder::class,
+            VideoSeeder::class,
             ArticleSeeder::class,
         ]);
+
+        $this->command->info('✅ Database seeding complete!');
     }
 }
-
