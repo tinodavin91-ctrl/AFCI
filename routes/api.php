@@ -18,6 +18,15 @@ use App\Http\Controllers\Api\AdminController;
 
 use Illuminate\Support\Facades\Route;
 
+Route::get('/debug-env', function () {
+    return response()->json([
+        'env_DB_CONNECTION' => env('DB_CONNECTION'),
+        'getenv_DB_CONNECTION' => getenv('DB_CONNECTION'),
+        'config_default' => config('database.default'),
+        'env_DB_HOST' => env('DB_HOST'),
+    ]);
+});
+
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
@@ -99,5 +108,3 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/admin/users/{user}/role', [AdminController::class, 'updateRole']);
     Route::delete('/admin/{type}/{id}', [AdminController::class, 'deleteContent']);
 });
-
-
