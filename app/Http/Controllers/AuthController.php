@@ -102,4 +102,36 @@ class AuthController extends Controller
         'email' => [__($status)],
     ]);
 }
+
+public function profile(Request $request)
+{
+    return response()->json(['user' => $request->user()]);
+}
+
+public function updateProfile(Request $request)
+{
+    $user = $request->user();
+
+    $data = $request->validate([
+        'name' => ['sometimes', 'string', 'max:255'],
+        'email' => ['sometimes', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
+        'password' => ['sometimes', 'string', 'min:8', 'confirmed'],
+    ]);
+
+    if (isset($data['name'])) {
+        $user->name = $data['name'];
+    }
+
+    if (isset($data['email'])) {
+        $user->email = $data['email'];
+    }
+
+    if (isset($data['password'])) {
+        $user->password = Hash::make($data['password']);
+    }
+
+    $user->save();
+
+    return response()->json(['user' => $user]);
+}
 }
