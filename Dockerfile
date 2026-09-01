@@ -13,7 +13,6 @@ COPY . .
 RUN cp .env.example .env \
     && sed -i 's/APP_KEY=/APP_KEY=base64:NfZ\/ahEryTyd8BSRJy3cRfGUnubersxtpk2yqV\/c+H0=/g' .env \
     && sed -i 's/APP_ENV=local/APP_ENV=production/g' .env \
-    && sed -i 's/APP_DEBUG=true/APP_DEBUG=false/g' .env \
     && touch database/database.sqlite \
     && chmod -R 777 .env database storage bootstrap/cache
 
