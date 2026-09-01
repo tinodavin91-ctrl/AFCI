@@ -24,6 +24,8 @@ Route::get('/debug-env', function () {
         'getenv_DB_CONNECTION' => getenv('DB_CONNECTION'),
         'config_default' => config('database.default'),
         'env_DB_HOST' => env('DB_HOST'),
+        'env_TEST_VAR' => env('TEST_VAR'),
+        'getenv_TEST_VAR' => getenv('TEST_VAR'),
     ]);
 });
 
