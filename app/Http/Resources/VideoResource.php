@@ -16,6 +16,7 @@ class VideoResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'youtube_id' => $this->youtube_id,
             'title' => $this->title,
             'description' => $this->description,
             'video_url' => $this->video_url,
@@ -30,4 +31,3 @@ class VideoResource extends JsonResource
         ];
     }
 }
-
