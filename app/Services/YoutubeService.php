@@ -28,6 +28,10 @@ class YoutubeService
         ]);
 
         if ($response->failed()) {
+            \Log::error('YouTube API failed', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
             return [];
         }
 
@@ -44,4 +48,3 @@ class YoutubeService
             ->toArray();
     }
 }
-

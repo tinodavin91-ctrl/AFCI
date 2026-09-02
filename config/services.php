@@ -39,4 +39,8 @@ return [
         'api_key' => env('GNEWS_API_KEY'),
     ],
 
+    'youtube' => [
+        'key' => env('YOUTUBE_API_KEY'),
+    ],
+
 ];

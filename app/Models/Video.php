@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 class Video extends Model
 {
     protected $fillable = [
-        'user_id', 'title', 'description', 'video_url', 'thumbnail_url',
+        'user_id', 'youtube_id', 'title', 'description', 'video_url', 'thumbnail_url',
         'duration', 'category', 'views', 'status', 'published_at',
     ];
 
@@ -28,18 +28,17 @@ class Video extends Model
     }
 
     public function likes(): MorphMany
-{
-    return $this->morphMany(Like::class, 'likeable');
-}
+    {
+        return $this->morphMany(Like::class, 'likeable');
+    }
 
-public function comments(): MorphMany
-{
-    return $this->morphMany(Comment::class, 'commentable');
-}
+    public function comments(): MorphMany
+    {
+        return $this->morphMany(Comment::class, 'commentable');
+    }
 
-public function bookmarks(): MorphMany
-{
-    return $this->morphMany(Bookmark::class, 'bookmarkable');
+    public function bookmarks(): MorphMany
+    {
+        return $this->morphMany(Bookmark::class, 'bookmarkable');
+    }
 }
-}
-
