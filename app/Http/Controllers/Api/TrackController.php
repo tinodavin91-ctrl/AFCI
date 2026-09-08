@@ -9,27 +9,29 @@ use Illuminate\Http\Request;
 
 class TrackController extends Controller
 {
-   public function index(Request $request)
-{
-    $tracks = Track::published()
-        ->when($request->search, function ($q, $search) {
-            $q->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                    ->orWhere('artist', 'like', "%{$search}%")
-                    ->orWhere('album', 'like', "%{$search}%");
-            });
-        })
-        ->when($request->genre, fn($q, $g) => $q->where('genre', $g))
-        ->when($request->sort === 'trending', fn($q) => $q->orderByDesc('plays'), fn($q) => $q->latest('published_at'))
-        ->paginate(15);
+    public function index(Request $request)
+    {
+        $tracks = Track::published()
+            ->withCount(['likes', 'comments'])
+            ->when($request->search, function ($q, $search) {
+                $q->where(function ($q) use ($search) {
+                    $q->where('title', 'like', "%{$search}%")
+                        ->orWhere('artist', 'like', "%{$search}%")
+                        ->orWhere('album', 'like', "%{$search}%");
+                });
+            })
+            ->when($request->genre, fn($q, $g) => $q->where('genre', $g))
+            ->when($request->sort === 'trending', fn($q) => $q->orderByDesc('plays'), fn($q) => $q->latest('published_at'))
+            ->paginate(15);
 
-    return TrackResource::collection($tracks);
-}
+        return TrackResource::collection($tracks);
+    }
 
     public function show(Track $track)
     {
         abort_unless($track->status === 'published', 404);
         $track->increment('plays');
+        $track->loadCount(['likes', 'comments']);
         return new TrackResource($track);
     }
 
@@ -86,11 +88,12 @@ class TrackController extends Controller
     }
 
     public function mine(Request $request)
-{
-    $tracks = Track::where('user_id', $request->user()->id)
-        ->latest()
-        ->paginate(15);
+    {
+        $tracks = Track::where('user_id', $request->user()->id)
+            ->withCount(['likes', 'comments'])
+            ->latest()
+            ->paginate(15);
 
-    return TrackResource::collection($tracks);
-}
+        return TrackResource::collection($tracks);
+    }
 }

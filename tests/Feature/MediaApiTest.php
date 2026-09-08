@@ -40,7 +40,16 @@ class MediaApiTest extends TestCase
 
     public function test_video_filtering_and_trending_sort(): void
     {
-        $this->seed();
+        $user = \App\Models\User::factory()->create();
+        \App\Models\Video::create([
+            'user_id' => $user->id,
+            'title' => 'African Culture Spotlight',
+            'video_url' => 'https://example.com/video.mp4',
+            'category' => 'Culture',
+            'views' => 1200,
+            'status' => 'published',
+            'published_at' => now(),
+        ]);
 
         $response = $this->getJson('/api/videos?sort=trending');
         $response->assertStatus(200);

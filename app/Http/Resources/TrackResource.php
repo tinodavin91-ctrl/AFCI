@@ -25,8 +25,8 @@ class TrackResource extends JsonResource
             'genre' => $this->genre,
             'plays' => $this->plays,
             'published_at' => $this->published_at,
-            'likes_count' => $this->likes()->count(),
-            'comments_count' => $this->comments()->count(),
+            'likes_count' => $this->likes_count ?? $this->likes()->count(),
+            'comments_count' => $this->comments_count ?? $this->comments()->count(),
         ];
     }
 }

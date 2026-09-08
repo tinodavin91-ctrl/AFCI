@@ -25,9 +25,9 @@ class VideoResource extends JsonResource
             'category' => $this->category,
             'views' => $this->views,
             'published_at' => $this->published_at,
-            'likes_count' => $this->likes()->count(),
-            'comments_count' => $this->comments()->count(),
-            'author_name' => $this->user?->name ?? 'AFCE Media',
+            'likes_count' => $this->likes_count ?? $this->likes()->count(),
+            'comments_count' => $this->comments_count ?? $this->comments()->count(),
+            'author_name' => $this->relationLoaded('user') ? ($this->user?->name ?? 'AFCE Media') : ($this->user?->name ?? 'AFCE Media'),
         ];
     }
 }

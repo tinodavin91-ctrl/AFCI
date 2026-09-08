@@ -24,9 +24,9 @@ class ArticleResource extends JsonResource
             'category' => $this->category,
             'views' => $this->views,
             'published_at' => $this->published_at,
-            'likes_count' => $this->likes()->count(),
-            'comments_count' => $this->comments()->count(),
-            'author_name' => $this->user?->name ?? 'AFCE Editorial',
+            'likes_count' => $this->likes_count ?? $this->likes()->count(),
+            'comments_count' => $this->comments_count ?? $this->comments()->count(),
+            'author_name' => $this->relationLoaded('user') ? ($this->user?->name ?? 'AFCE Editorial') : ($this->user?->name ?? 'AFCE Editorial'),
         ];
     }
 }

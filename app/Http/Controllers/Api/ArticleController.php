@@ -10,26 +10,29 @@ use Illuminate\Http\Request;
 class ArticleController extends Controller
 {
     public function index(Request $request)
-{
-    $articles = Article::published()
-        ->when($request->search, function ($q, $search) {
-            $q->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                    ->orWhere('body', 'like', "%{$search}%")
-                    ->orWhere('excerpt', 'like', "%{$search}%");
-            });
-        })
-        ->when($request->category, fn($q, $c) => $q->where('category', $c))
-        ->when($request->sort === 'trending', fn($q) => $q->orderByDesc('views'), fn($q) => $q->latest('published_at'))
-        ->paginate(15);
+    {
+        $articles = Article::published()
+            ->with('user')
+            ->withCount(['likes', 'comments'])
+            ->when($request->search, function ($q, $search) {
+                $q->where(function ($q) use ($search) {
+                    $q->where('title', 'like', "%{$search}%")
+                        ->orWhere('body', 'like', "%{$search}%")
+                        ->orWhere('excerpt', 'like', "%{$search}%");
+                });
+            })
+            ->when($request->category, fn($q, $c) => $q->where('category', $c))
+            ->when($request->sort === 'trending', fn($q) => $q->orderByDesc('views'), fn($q) => $q->latest('published_at'))
+            ->paginate(15);
 
-    return ArticleResource::collection($articles);
-}
+        return ArticleResource::collection($articles);
+    }
 
     public function show(Article $article)
     {
         abort_unless($article->status === 'published', 404);
         $article->increment('views');
+        $article->loadMissing('user')->loadCount(['likes', 'comments']);
         return new ArticleResource($article);
     }
 
@@ -82,11 +85,13 @@ class ArticleController extends Controller
     }
 
     public function mine(Request $request)
-{
-    $articles = Article::where('user_id', $request->user()->id)
-        ->latest()
-        ->paginate(15);
+    {
+        $articles = Article::where('user_id', $request->user()->id)
+            ->with('user')
+            ->withCount(['likes', 'comments'])
+            ->latest()
+            ->paginate(15);
 
-    return ArticleResource::collection($articles);
-}
+        return ArticleResource::collection($articles);
+    }
 }

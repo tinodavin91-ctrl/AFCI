@@ -99,4 +99,52 @@ class PlaylistsAndAdminTest extends TestCase
         $allowedResponse->assertStatus(200)
             ->assertJsonStructure(['stats' => ['total_users', 'total_videos', 'total_tracks']]);
     }
+
+    public function test_private_playlist_access_with_sanctum_auth(): void
+    {
+        $owner = User::factory()->create();
+        $stranger = User::factory()->create();
+
+        $playlist = Playlist::create([
+            'user_id' => $owner->id,
+            'title' => 'Secret Playlist',
+            'is_public' => false,
+        ]);
+
+        // Unauthenticated access fails
+        $this->getJson("/api/playlists/{$playlist->id}")->assertStatus(403);
+
+        // Stranger access fails
+        $this->actingAs($stranger, 'sanctum')
+            ->getJson("/api/playlists/{$playlist->id}")
+            ->assertStatus(403);
+
+        // Owner access succeeds
+        $this->actingAs($owner, 'sanctum')
+            ->getJson("/api/playlists/{$playlist->id}")
+            ->assertStatus(200)
+            ->assertJsonPath('title', 'Secret Playlist');
+    }
+
+    public function test_notification_deletion_returns_json(): void
+    {
+        $user = User::factory()->create();
+        $notification = AppNotification::create([
+            'user_id' => $user->id,
+            'type' => 'system',
+            'title' => 'Welcome',
+            'message' => 'Welcome to AFCE Media',
+        ]);
+
+        $response = $this->actingAs($user, 'sanctum')
+            ->deleteJson("/api/notifications/{$notification->id}");
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'success' => true,
+                'message' => 'Notification deleted',
+            ]);
+
+        $this->assertDatabaseMissing('app_notifications', ['id' => $notification->id]);
+    }
 }

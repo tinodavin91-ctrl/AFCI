@@ -18,9 +18,9 @@ class TrendingController extends Controller
         $limit = (int) $request->get('limit', 5);
         $type = $request->get('type');
 
-        $trendingVideos = Video::published()->orderByDesc('views')->take($limit)->get();
-        $trendingTracks = Track::published()->orderByDesc('plays')->take($limit)->get();
-        $trendingArticles = Article::published()->orderByDesc('views')->take($limit)->get();
+        $trendingVideos = Video::published()->with('user')->withCount(['likes', 'comments'])->orderByDesc('views')->take($limit)->get();
+        $trendingTracks = Track::published()->withCount(['likes', 'comments'])->orderByDesc('plays')->take($limit)->get();
+        $trendingArticles = Article::published()->with('user')->withCount(['likes', 'comments'])->orderByDesc('views')->take($limit)->get();
 
         if ($type === 'video') {
             return VideoResource::collection($trendingVideos);

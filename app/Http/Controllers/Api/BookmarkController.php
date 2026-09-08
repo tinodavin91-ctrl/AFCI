@@ -44,7 +44,14 @@ class BookmarkController extends Controller
     {
         $userId = $request->user()->id;
 
-        $bookmarks = Bookmark::where('user_id', $userId)->latest()->get();
+        $bookmarks = Bookmark::where('user_id', $userId)
+            ->latest()
+            ->get();
+
+        $bookmarks->loadMorph('bookmarkable', [
+            Video::class => ['user'],
+            Article::class => ['user'],
+        ]);
 
         $videos = [];
         $tracks = [];

@@ -9,26 +9,29 @@ use Illuminate\Http\Request;
 
 class VideoController extends Controller
 {
-   public function index(Request $request)
-{
-    $videos = Video::published()
-        ->when($request->search, function ($q, $search) {
-            $q->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%");
-            });
-        })
-        ->when($request->category, fn($q, $c) => $q->where('category', $c))
-        ->when($request->sort === 'trending', fn($q) => $q->orderByDesc('views'), fn($q) => $q->latest('published_at'))
-        ->paginate(15);
+    public function index(Request $request)
+    {
+        $videos = Video::published()
+            ->with('user')
+            ->withCount(['likes', 'comments'])
+            ->when($request->search, function ($q, $search) {
+                $q->where(function ($q) use ($search) {
+                    $q->where('title', 'like', "%{$search}%")
+                        ->orWhere('description', 'like', "%{$search}%");
+                });
+            })
+            ->when($request->category, fn($q, $c) => $q->where('category', $c))
+            ->when($request->sort === 'trending', fn($q) => $q->orderByDesc('views'), fn($q) => $q->latest('published_at'))
+            ->paginate(15);
 
-    return VideoResource::collection($videos);
-}
+        return VideoResource::collection($videos);
+    }
 
     public function show(Video $video)
     {
         abort_unless($video->status === 'published', 404);
         $video->increment('views');
+        $video->loadMissing('user')->loadCount(['likes', 'comments']);
         return new VideoResource($video);
     }
 
@@ -83,11 +86,13 @@ class VideoController extends Controller
     }
 
     public function mine(Request $request)
-{
-    $videos = Video::where('user_id', $request->user()->id)
-        ->latest()
-        ->paginate(15);
+    {
+        $videos = Video::where('user_id', $request->user()->id)
+            ->with('user')
+            ->withCount(['likes', 'comments'])
+            ->latest()
+            ->paginate(15);
 
-    return VideoResource::collection($videos);
-}
+        return VideoResource::collection($videos);
+    }
 }

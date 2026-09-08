@@ -29,6 +29,8 @@ class SearchController extends Controller
         }
 
         $videos = Video::published()
+            ->with('user')
+            ->withCount(['likes', 'comments'])
             ->where(function ($q) use ($query) {
                 $q->where('title', 'like', "%{$query}%")
                     ->orWhere('description', 'like', "%{$query}%")
@@ -39,6 +41,7 @@ class SearchController extends Controller
             ->get();
 
         $tracks = Track::published()
+            ->withCount(['likes', 'comments'])
             ->where(function ($q) use ($query) {
                 $q->where('title', 'like', "%{$query}%")
                     ->orWhere('artist', 'like', "%{$query}%")
@@ -50,6 +53,8 @@ class SearchController extends Controller
             ->get();
 
         $articles = Article::published()
+            ->with('user')
+            ->withCount(['likes', 'comments'])
             ->where(function ($q) use ($query) {
                 $q->where('title', 'like', "%{$query}%")
                     ->orWhere('excerpt', 'like', "%{$query}%")

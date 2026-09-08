@@ -11,11 +11,15 @@ class PlaylistController extends Controller
 {
     public function index(Request $request)
     {
-        $userId = $request->user()?->id;
+        $userId = ($request->user('sanctum') ?? $request->user())?->id;
 
         $playlists = Playlist::with('user')
-            ->where('is_public', true)
-            ->when($userId, fn ($q) => $q->orWhere('user_id', $userId))
+            ->where(function ($query) use ($userId) {
+                $query->where('is_public', true);
+                if ($userId) {
+                    $query->orWhere('user_id', $userId);
+                }
+            })
             ->latest()
             ->paginate(15);
 
@@ -38,9 +42,10 @@ class PlaylistController extends Controller
         return response()->json($playlist->load('user'), 201);
     }
 
-    public function show(Playlist $playlist)
+    public function show(Request $request, Playlist $playlist)
     {
-        abort_unless($playlist->is_public || auth()->id() === $playlist->user_id, 403);
+        $userId = ($request->user('sanctum') ?? $request->user())?->id;
+        abort_unless($playlist->is_public || ($userId && $userId === $playlist->user_id), 403);
 
         return response()->json($playlist->load(['user', 'tracks']));
     }
